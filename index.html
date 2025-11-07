@@ -129,7 +129,6 @@
                         className="glass-card rounded-3xl p-6 m-4 max-w-sm w-full relative"
                         onClick={(e) => e.stopPropagation()} // 防止點擊 Modal 內容時關閉
                     >
-                        {/* 🌟 調整 Modal 標題為 "公司資訊" */}
                         <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-3">公司資訊</h2>
                         <div className="space-y-4">
                             <div>
@@ -512,12 +511,13 @@
                                                 <h3 className="text-xl font-bold mb-2">{searchResult.companyName}</h3>
                                                 <p className="text-blue-400 mb-3">{searchResult.taxId}</p>
                                             </div>
+                                            {/* 🌟 修改標籤文字 */}
                                             <span className={`px-3 py-1 text-xs rounded-full ${
                                                 searchResult.source === 'local' 
                                                     ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                                                     : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
                                             }`}>
-                                                {searchResult.source === 'local' ? '本地' : 'API'}
+                                                {searchResult.source === 'local' ? '歷史紀錄' : '查詢'}
                                             </span>
                                         </div>
                                         {searchResult.address && <p className="text-sm text-gray-400 mb-2">📍 {searchResult.address}</p>}
@@ -602,9 +602,8 @@
                                     </label>
                                 </div>
 
-                                {/* 搜尋框 - 🌟 移除 Icon 和相關樣式 */}
+                                {/* 搜尋框 */}
                                 <div className="relative flex items-center">
-                                    {/* 移除 Search Icon 元素 */}
                                     <input
                                         type="text"
                                         value={historySearchText}
