@@ -38,6 +38,9 @@
         .primary-button:active {
             background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
         }
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
     </style>
 </head>
 <body>
@@ -113,6 +116,53 @@
             </svg>
         );
 
+        // Modal Component
+        function TaxIdModal({ content, onClose }) {
+            if (!content) return null;
+
+            return (
+                <div 
+                    className="fixed inset-0 z-50 flex items-center justify-center modal-overlay"
+                    onClick={onClose}
+                >
+                    <div 
+                        className="glass-card rounded-3xl p-6 m-4 max-w-sm w-full relative"
+                        onClick={(e) => e.stopPropagation()} // 防止點擊 Modal 內容時關閉
+                    >
+                        <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-3">公司資訊 (放大)</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-gray-400 text-sm mb-1">公司抬頭</p>
+                                <p className="text-2xl font-bold break-words">{content.companyName}</p>
+                            </div>
+                            <div>
+                                <p className="text-gray-400 text-sm mb-1">統一編號</p>
+                                <p className="text-3xl font-extrabold text-blue-400">{content.taxId}</p>
+                            </div>
+                            {content.note && (
+                                <div>
+                                    <p className="text-gray-400 text-sm mb-1">備註</p>
+                                    <p className="text-base text-gray-300 whitespace-pre-wrap">{content.note}</p>
+                                </div>
+                            )}
+                        </div>
+                        <button
+                            onClick={onClose}
+                            className="w-full mt-6 py-3 primary-button text-white rounded-xl font-semibold"
+                        >
+                            關閉
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="absolute top-4 right-4 text-gray-400 hover:text-white"
+                        >
+                            <X />
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
         function TaxIdManager() {
             const [activeTab, setActiveTab] = useState('search');
             const [records, setRecords] = useState([]);
@@ -126,6 +176,7 @@
             const [loading, setLoading] = useState(true);
             const [editForm, setEditForm] = useState({});
             const [historySearchText, setHistorySearchText] = useState('');
+            const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
 
             useEffect(() => {
                 loadRecords();
@@ -345,7 +396,9 @@
                     }
                 } catch (error) {
                     console.error('匯入錯誤:', error);
-                    alert('匯入失敗，請確認檔案格式正確');
+                    // 根據用戶個性化需求，改進錯誤提示
+                    const userFriendlyError = "匯入失敗。請檢查檔案是否為 JSON 格式，並且內容是包含 'taxId' 和 'companyName' 欄位的資料陣列。";
+                    alert(userFriendlyError);
                 }
                 event.target.value = '';
             };
@@ -366,6 +419,14 @@
                 setSearchResult(null);
             };
 
+            const openModal = (taxId, companyName, note = '') => {
+                setModalContent({ taxId, companyName, note });
+            };
+
+            const closeModal = () => {
+                setModalContent(null);
+            };
+
             const filteredRecords = records.filter(record => {
                 const searchLower = historySearchText.toLowerCase();
                 return record.taxId.includes(searchLower) || 
@@ -377,6 +438,8 @@
 
             return (
                 <div className="min-h-screen bg-black text-white">
+                    <TaxIdModal content={modalContent} onClose={closeModal} />
+
                     {/* Header */}
                     <div className="p-6 pb-4">
                         <h1 className="text-2xl font-bold text-center">公司抬頭及統編查詢</h1>
@@ -439,7 +502,10 @@
 
                                 {/* 查詢結果 */}
                                 {searchResult && (
-                                    <div className="glass-card rounded-3xl p-6">
+                                    <div 
+                                        className="glass-card rounded-3xl p-6 cursor-pointer hover:bg-opacity-90 transition-all"
+                                        onClick={() => openModal(searchResult.taxId, searchResult.companyName, searchResult.note)}
+                                    >
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex-1">
                                                 <h3 className="text-xl font-bold mb-2">{searchResult.companyName}</h3>
@@ -460,7 +526,7 @@
                                         
                                         {searchResult.source === 'api' && (
                                             <button
-                                                onClick={handleSaveFromSearch}
+                                                onClick={(e) => { e.stopPropagation(); handleSaveFromSearch(); }}
                                                 className="w-full mt-4 py-4 primary-button text-white rounded-2xl font-semibold flex items-center justify-center gap-2"
                                             >
                                                 <Save />
@@ -535,9 +601,9 @@
                                     </label>
                                 </div>
 
-                                {/* 搜尋框 */}
+                                {/* 搜尋框 - 修正 Icon 顯示問題 */}
                                 <div className="relative flex items-center">
-                                    <div className="absolute left-4 pointer-events-none text-gray-400">
+                                    <div className="absolute left-4 text-gray-400">
                                         <Search />
                                     </div>
                                     <input
@@ -624,9 +690,13 @@
                                         </div>
                                     ) : (
                                         filteredRecords.map((record) => (
-                                            <div key={record.taxId} className="glass-card rounded-2xl p-4">
+                                            <div 
+                                                key={record.taxId} 
+                                                className={`glass-card rounded-2xl p-4 ${editingId === record.taxId ? '' : 'cursor-pointer hover:bg-opacity-90 transition-all'}`}
+                                                onClick={editingId === record.taxId ? null : () => openModal(record.taxId, record.companyName, record.note)}
+                                            >
                                                 {editingId === record.taxId ? (
-                                                    <div className="space-y-3">
+                                                    <div className="space-y-3" onClick={(e) => e.stopPropagation()}>
                                                         <div>
                                                             <label className="block text-gray-400 text-sm mb-2">公司抬頭 *</label>
                                                             <input
@@ -669,7 +739,7 @@
                                                                 <h3 className="text-lg font-bold mb-1">{record.companyName}</h3>
                                                                 <p className="text-blue-400 text-sm">{record.taxId}</p>
                                                             </div>
-                                                            <div className="flex gap-2 ml-2">
+                                                            <div className="flex gap-2 ml-2" onClick={(e) => e.stopPropagation()}>
                                                                 <button
                                                                     onClick={() => startEdit(record)}
                                                                     className="p-2 glass-button rounded-lg text-blue-400 hover:scale-95 transition-all"
