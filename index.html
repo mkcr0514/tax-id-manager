@@ -41,7 +41,6 @@
         .modal-overlay {
             background-color: rgba(0, 0, 0, 0.7);
         }
-        /* ❗ 刪除自定義的 .pl-13 類別，改用標準的 pl-14 */
     </style>
 </head>
 <body>
@@ -187,8 +186,7 @@
             const [editingId, setEditingId] = useState(null);
             const [newRecord, setNewRecord] = useState({ taxId: '', companyName: '', note: '' });
             const [loading, setLoading] = useState(true);
-            // ❗ 修正：將 {}=> useState({})
-            const [editForm, setEditForm] = useState({});
+            const [editForm, setEditForm] = useState({}); // 修正：確保使用 useState 初始化
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
@@ -648,18 +646,18 @@
                                     </label>
                                 </div>
 
-                                {/* 搜尋框 - 實現置頂固定 (Sticky) */}
-                                <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/80 backdrop-blur-md"> 
+                                {/* 🌟 搜尋框 - 實現置頂固定 (Sticky) UI/顏色調整 */}
+                                <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
                                     <div className="relative flex items-center">
-                                        {/* 調整 Icon 位置 (left-6) 和顏色 (text-gray-500) */}
-                                        <Search className="w-5 h-5 absolute left-6 text-gray-500 pointer-events-none" />
+                                        {/* 🌟 Icon 調整：左側距離 (left-6) 顏色 (text-gray-400) */}
+                                        <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
                                         <input
                                             type="text"
                                             value={historySearchText}
                                             onChange={(e) => setHistorySearchText(e.target.value)}
                                             placeholder="搜尋統編或公司名稱"
                                             // 調整 padding-left 至 pl-14
-                                            className="w-full pl-14 pr-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500 placeholder:text-gray-500"
+                                            className="w-full pl-14 pr-4 py-4 rounded-2xl outline-none focus:border focus:border-blue-500 bg-black/60 border border-gray-700 placeholder:text-gray-500"
                                         />
                                         {historySearchText && (
                                             <button
