@@ -622,10 +622,10 @@
 
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
-                            // 🌟 Content 容器使用 space-y-4 來統一間距
-                            <div className="space-y-4">
-                                {/* 1. 操作按鈕 (新增/匯出/匯入) */}
-                                <div className="grid grid-cols-3 gap-3">
+                            // 🌟 Content 容器不再使用 space-y-4，改由手動控制間距
+                            <div>
+                                {/* 1. 操作按鈕 (新增/匯出/匯入) - 設置 mb-4 保持 16px 間距 */}
+                                <div className="grid grid-cols-3 gap-3 mb-4">
                                     <button
                                         onClick={() => setIsAdding(true)}
                                         className="glass-button rounded-2xl py-4 font-medium flex flex-col items-center justify-center gap-2 hover:scale-95 active:scale-90 transition-all"
@@ -649,9 +649,9 @@
                                 </div>
 
                                 {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
-                                {/* 🌟 修正點: 移除 pt-4 和 pb-4，讓 space-y-4 控制間距 */}
-                                <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
-                                    <div className="relative flex items-center py-4"> {/* 🌟 內層 Div 使用 py-4 恢復搜尋框的垂直空間 */}
+                                {/* 🌟 修正點: 使用 my-4 控制上下間距，確保與上下組件間隔 16px */}
+                                <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl my-4"> 
+                                    <div className="relative flex items-center py-4">
                                         <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
                                         <input
                                             type="text"
@@ -671,9 +671,9 @@
                                     </div>
                                 </div>
 
-                                {/* 3. 新增表單 (間距由外層 space-y-4 控制) */}
+                                {/* 3. 新增表單 (條件式渲染，使用 mb-4 統一間距) */}
                                 {isAdding && (
-                                    <div className="glass-card rounded-3xl p-6">
+                                    <div className="glass-card rounded-3xl p-6 mb-4">
                                         <h2 className="text-xl font-bold mb-4">新增記錄</h2>
                                         <div className="space-y-4">
                                             <div>
@@ -728,7 +728,7 @@
                                     </div>
                                 )}
 
-                                {/* 4. 記錄列表 (間距由外層 space-y-4 控制) */}
+                                {/* 4. 記錄列表 (使用 space-y-3 於內部卡片) */}
                                 <div className="space-y-3">
                                     {loading ? (
                                         <div className="text-center py-8 text-gray-400">載入中...</div>
