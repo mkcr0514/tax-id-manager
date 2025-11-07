@@ -41,10 +41,7 @@
         .modal-overlay {
             background-color: rgba(0, 0, 0, 0.7);
         }
-        /* 由於 Tailwind 預設沒有 pl-13，我們手動加入 */
-        .pl-13 {
-            padding-left: 3.25rem; /* 52px */
-        }
+        /* ❗ 刪除自定義的 .pl-13 類別，改用標準的 pl-14 */
     </style>
 </head>
 <body>
@@ -190,7 +187,8 @@
             const [editingId, setEditingId] = useState(null);
             const [newRecord, setNewRecord] = useState({ taxId: '', companyName: '', note: '' });
             const [loading, setLoading] = useState(true);
-            const [editForm, setEditForm] = {};
+            // ❗ 修正：將 {}=> useState({})
+            const [editForm, setEditForm] = useState({});
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
@@ -532,7 +530,7 @@
                                         />
                                         {inputDisplayValue && (
                                             <button
-                                                // 加大點擊範圍: p-2 (padding: 8px)
+                                                // 放大點擊範圍: p-2
                                                 onClick={handleClearAll}
                                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-2"
                                             >
@@ -653,15 +651,15 @@
                                 {/* 搜尋框 - 實現置頂固定 (Sticky) */}
                                 <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/80 backdrop-blur-md"> 
                                     <div className="relative flex items-center">
-                                        {/* 🌟 調整 Icon 位置和顏色 */}
+                                        {/* 調整 Icon 位置 (left-6) 和顏色 (text-gray-500) */}
                                         <Search className="w-5 h-5 absolute left-6 text-gray-500 pointer-events-none" />
                                         <input
                                             type="text"
                                             value={historySearchText}
                                             onChange={(e) => setHistorySearchText(e.target.value)}
                                             placeholder="搜尋統編或公司名稱"
-                                            // 🌟 調整 padding-left 至 pl-13
-                                            className="w-full pl-13 pr-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500 placeholder:text-gray-500"
+                                            // 調整 padding-left 至 pl-14
+                                            className="w-full pl-14 pr-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500 placeholder:text-gray-500"
                                         />
                                         {historySearchText && (
                                             <button
