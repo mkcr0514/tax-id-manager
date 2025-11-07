@@ -115,6 +115,19 @@
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 001.414.586H19a2 2 0 002-2V7a2 2 0 00-2-2h-8.172a2 2 0 00-1.414.586L3 12z" />
             </svg>
         );
+        
+        // 🌟 新增清除所有內容的 Icon
+        const ClearAll = () => (
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+             </svg>
+        );
+
+        const ArrowUp = () => (
+             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+             </svg>
+        );
 
         // Modal Component
         function TaxIdModal({ content, onClose }) {
@@ -177,14 +190,32 @@
             const [editForm, setEditForm] = useState({});
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
+            const [showBackToTop, setShowBackToTop] = useState(false);
 
             useEffect(() => {
                 loadRecords();
             }, []);
-
+            
             useEffect(() => {
+                const handleScroll = () => {
+                    if (activeTab === 'history') {
+                        if (window.scrollY > 300) { 
+                            setShowBackToTop(true);
+                        } else {
+                            setShowBackToTop(false);
+                        }
+                    } else {
+                        setShowBackToTop(false);
+                    }
+                };
+
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, [activeTab]); 
+
+            const scrollToTop = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
-            }, [activeTab]);
+            };
 
             const loadRecords = () => {
                 try {
@@ -247,8 +278,8 @@
                 
                 if (localRecord) {
                     setSearchResult({ ...localRecord, source: 'local' });
-                    setDisplayTaxId(taxId); // 保留查詢內容
-                    setSearchTaxId(''); // 清空輸入狀態，但顯示用 displayTaxId
+                    setDisplayTaxId(taxId); 
+                    setSearchTaxId(''); 
                     setIsSearching(false);
                 } else {
                     const apiData = await queryG0vAPI(taxId);
@@ -265,8 +296,8 @@
                                 capital: apiData.data.資本總額 || apiData.data.資本額 || '',
                                 source: 'api'
                             });
-                            setDisplayTaxId(taxId); // 保留查詢內容
-                            setSearchTaxId(''); // 清空輸入狀態
+                            setDisplayTaxId(taxId); 
+                            setSearchTaxId(''); 
                         } else {
                             alert('查無此統編資料');
                         }
@@ -274,6 +305,13 @@
                         alert('查無此統編資料');
                     }
                 }
+            };
+
+            // 🌟 清除全部內容的函式
+            const handleClearAll = () => {
+                setSearchTaxId('');
+                setDisplayTaxId('');
+                setSearchResult(null);
             };
 
             const handleSaveFromSearch = () => {
@@ -396,7 +434,6 @@
                     }
                 } catch (error) {
                     console.error('匯入錯誤:', error);
-                    // 根據用戶個性化需求，改進錯誤提示
                     const userFriendlyError = "匯入失敗。請檢查檔案是否為 JSON 格式，並且內容是包含 'taxId' 和 'companyName' 欄位的資料陣列。";
                     alert(userFriendlyError);
                 }
@@ -404,19 +441,17 @@
             };
 
             const handleNumberClick = (num) => {
-                if (searchTaxId.length < 8) {
+                // 如果有搜尋結果，先清空再輸入
+                if (searchResult) {
+                    handleClearAll();
+                    setSearchTaxId(num);
+                } else if (searchTaxId.length < 8) {
                     setSearchTaxId(searchTaxId + num);
                 }
             };
 
             const handleBackspace = () => {
                 setSearchTaxId(searchTaxId.slice(0, -1));
-            };
-
-            const handleClear = () => {
-                setSearchTaxId('');
-                setDisplayTaxId('');
-                setSearchResult(null);
             };
 
             const openModal = (taxId, companyName, note = '') => {
@@ -435,6 +470,9 @@
 
             // 決定輸入框顯示的內容
             const inputDisplayValue = displayTaxId || searchTaxId;
+            
+            // 🌟 判斷左下角按鈕狀態
+            const isSearchResultPresent = !!searchResult;
 
             return (
                 <div className="min-h-screen bg-black text-white">
@@ -491,8 +529,9 @@
                                         />
                                         {inputDisplayValue && (
                                             <button
-                                                onClick={handleClear}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                                                // 🌟 加大點擊範圍: p-2 (padding: 8px)
+                                                onClick={handleClearAll}
+                                                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-2"
                                             >
                                                 <X />
                                             </button>
@@ -511,7 +550,6 @@
                                                 <h3 className="text-xl font-bold mb-2">{searchResult.companyName}</h3>
                                                 <p className="text-blue-400 mb-3">{searchResult.taxId}</p>
                                             </div>
-                                            {/* 🌟 修改標籤文字 */}
                                             <span className={`px-3 py-1 text-xs rounded-full ${
                                                 searchResult.source === 'local' 
                                                     ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
@@ -552,10 +590,11 @@
                                     </div>
                                     <div className="grid grid-cols-3 gap-3">
                                         <button
-                                            onClick={handleBackspace}
-                                            className="aspect-square glass-button rounded-2xl flex items-center justify-center hover:scale-95 active:scale-90 transition-all text-red-400"
+                                            // 🌟 根據狀態切換功能 (Backspace / Clear All)
+                                            onClick={isSearchResultPresent ? handleClearAll : handleBackspace}
+                                            className={`aspect-square glass-button rounded-2xl flex items-center justify-center hover:scale-95 active:scale-90 transition-all ${isSearchResultPresent ? 'text-blue-400' : 'text-red-400'}`}
                                         >
-                                            <Delete />
+                                            {isSearchResultPresent ? <ClearAll /> : <Delete />}
                                         </button>
                                         <button
                                             onClick={() => handleNumberClick('0')}
@@ -571,6 +610,12 @@
                                             {isSearching ? <RefreshCw /> : <Search />}
                                         </button>
                                     </div>
+                                </div>
+
+                                {/* 🌟 資料來源貼齊鍵盤 */}
+                                <div className="p-2 text-center text-xs text-gray-500">
+                                    <p>資料來源：g0v 統編查詢 API</p>
+                                    <p className="mt-1">資料儲存於瀏覽器本地</p>
                                 </div>
                             </div>
                         )}
@@ -602,23 +647,26 @@
                                     </label>
                                 </div>
 
-                                {/* 搜尋框 */}
-                                <div className="relative flex items-center">
-                                    <input
-                                        type="text"
-                                        value={historySearchText}
-                                        onChange={(e) => setHistorySearchText(e.target.value)}
-                                        placeholder="搜尋統編或公司名稱"
-                                        className="w-full px-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500"
-                                    />
-                                    {historySearchText && (
-                                        <button
-                                            onClick={() => setHistorySearchText('')}
-                                            className="absolute right-4 text-gray-400 hover:text-white"
-                                        >
-                                            <X />
-                                        </button>
-                                    )}
+                                {/* 搜尋框 - 實現置頂固定 (Sticky) */}
+                                <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/80 backdrop-blur-md"> 
+                                    <div className="relative flex items-center">
+                                        <Search className="w-5 h-5 absolute left-7 text-gray-500 pointer-events-none" />
+                                        <input
+                                            type="text"
+                                            value={historySearchText}
+                                            onChange={(e) => setHistorySearchText(e.target.value)}
+                                            placeholder="搜尋統編或公司名稱"
+                                            className="w-full pl-12 pr-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500"
+                                        />
+                                        {historySearchText && (
+                                            <button
+                                                onClick={() => setHistorySearchText('')}
+                                                className="absolute right-7 text-gray-400 hover:text-white"
+                                            >
+                                                <X />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
 
                                 {/* 新增表單 */}
@@ -763,12 +811,16 @@
                             </div>
                         )}
                     </div>
-
-                    {/* Footer */}
-                    <div className="p-6 text-center text-xs text-gray-500">
-                        <p>資料來源：g0v 統編查詢 API</p>
-                        <p className="mt-1">資料儲存於瀏覽器本地</p>
-                    </div>
+                    
+                    {/* 🌟 Back to Top Button */}
+                    {showBackToTop && (
+                        <button
+                            onClick={scrollToTop}
+                            className="fixed bottom-24 right-6 p-4 primary-button rounded-full shadow-lg transition-all duration-300 z-50 hover:scale-105"
+                        >
+                            <ArrowUp />
+                        </button>
+                    )}
                 </div>
             );
         }
