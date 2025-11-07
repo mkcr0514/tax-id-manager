@@ -622,7 +622,6 @@
 
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
-                            // 🌟 Content 容器不再使用 space-y-4，改由手動控制間距
                             <div>
                                 {/* 1. 操作按鈕 (新增/匯出/匯入) - 設置 mb-4 保持 16px 間距 */}
                                 <div className="grid grid-cols-3 gap-3 mb-4">
@@ -649,25 +648,27 @@
                                 </div>
 
                                 {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
-                                {/* 🌟 修正點: 使用 my-4 控制上下間距，確保與上下組件間隔 16px */}
-                                <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl my-4"> 
-                                    <div className="relative flex items-center py-4">
-                                        <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
-                                        <input
-                                            type="text"
-                                            value={historySearchText}
-                                            onChange={(e) => setHistorySearchText(e.target.value)}
-                                            placeholder="搜尋統編或公司名稱"
-                                            className="w-full pl-14 pr-4 py-4 rounded-2xl outline-none focus:border focus:border-blue-500 bg-black/60 border border-gray-700 placeholder:text-gray-500"
-                                        />
-                                        {historySearchText && (
-                                            <button
-                                                onClick={() => setHistorySearchText('')}
-                                                className="absolute right-7 text-gray-400 hover:text-white"
-                                            >
-                                                <X />
-                                            </button>
-                                        )}
+                                {/* 🌟 修正點: 搜尋框容器使用 mb-4 控制下方間距，且因為是 sticky 元素，需要包裝一層來隔離定位樣式 */}
+                                <div className="mb-4">
+                                    <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
+                                        <div className="relative flex items-center py-4">
+                                            <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
+                                            <input
+                                                type="text"
+                                                value={historySearchText}
+                                                onChange={(e) => setHistorySearchText(e.target.value)}
+                                                placeholder="搜尋統編或公司名稱"
+                                                className="w-full pl-14 pr-4 py-4 rounded-2xl outline-none focus:border focus:border-blue-500 bg-black/60 border border-gray-700 placeholder:text-gray-500"
+                                            />
+                                            {historySearchText && (
+                                                <button
+                                                    onClick={() => setHistorySearchText('')}
+                                                    className="absolute right-7 text-gray-400 hover:text-white"
+                                                >
+                                                    <X />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -728,7 +729,7 @@
                                     </div>
                                 )}
 
-                                {/* 4. 記錄列表 (使用 space-y-3 於內部卡片) */}
+                                {/* 4. 記錄列表 (內部使用 space-y-3，整體不需額外 mb/mt) */}
                                 <div className="space-y-3">
                                     {loading ? (
                                         <div className="text-center py-8 text-gray-400">載入中...</div>
