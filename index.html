@@ -47,7 +47,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect } = React;
+        const { useState, useEffect, useRef } = React;
 
         // Icons
         const Search = ({ className = "w-5 h-5" }) => (
@@ -190,6 +190,9 @@
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
+            
+            // 🌟 創建 Ref 來指向輸入框
+            const searchInputRef = useRef(null);
 
             useEffect(() => {
                 loadRecords();
@@ -212,6 +215,14 @@
                 window.addEventListener('scroll', handleScroll);
                 return () => window.removeEventListener('scroll', handleScroll);
             }, [activeTab]); 
+            
+            // 🌟 處理自動聚焦
+            useEffect(() => {
+                if (activeTab === 'search' && searchInputRef.current) {
+                    searchInputRef.current.focus();
+                }
+            }, [activeTab]);
+
 
             const scrollToTop = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -521,12 +532,13 @@
                                     <label className="block text-gray-400 text-sm mb-3">統一編號</label>
                                     <div className="relative">
                                         <input
+                                            ref={searchInputRef} // 🌟 綁定 Ref
                                             type="text"
                                             value={inputDisplayValue}
                                             readOnly
                                             placeholder="請使用下方數字鍵盤輸入統一編號"
-                                            // 🌟 修正點：移除邊框和聚焦樣式
-                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl outline-none placeholder:text-gray-600 placeholder:text-lg"
+                                            // 🌟 修正點：還原框線樣式
+                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none placeholder:text-gray-600 placeholder:text-lg"
                                         />
                                         {inputDisplayValue && (
                                             <button
@@ -624,7 +636,7 @@
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
                             <div>
-                                {/* 1. 操作按鈕 (新增/匯出/匯入) - 設置 mb-4 保持 16px 間距 */}
+                                {/* 1. 操作按鈕 (新增/匯出/匯入) */}
                                 <div className="grid grid-cols-3 gap-3 mb-4">
                                     <button
                                         onClick={() => setIsAdding(true)}
@@ -648,7 +660,7 @@
                                     </label>
                                 </div>
 
-                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
+                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) */}
                                 <div className="mb-4">
                                     <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
                                         <div className="relative flex items-center pb-4 pt-0">
