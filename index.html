@@ -55,6 +55,14 @@
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         );
+        
+        // 🌟 新增 Document/File Icon 給查詢頁籤
+        const FileText = ({ className = "w-4 h-4" }) => (
+             <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-6-4v4m3-4v4m-3-4h.01M17 19H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2z" />
+             </svg>
+        );
+
 
         const History = () => (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,8 +199,8 @@
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
             
-            // 🌟 創建 Ref 來指向輸入框
-            const searchInputRef = useRef(null);
+            // 🌟 創建 Ref 來指向查詢輸入框
+            const queryInputRef = useRef(null);
 
             useEffect(() => {
                 loadRecords();
@@ -216,10 +224,10 @@
                 return () => window.removeEventListener('scroll', handleScroll);
             }, [activeTab]); 
             
-            // 🌟 處理自動聚焦
+            // 🌟 處理查詢頁籤自動聚焦
             useEffect(() => {
-                if (activeTab === 'search' && searchInputRef.current) {
-                    searchInputRef.current.focus();
+                if (activeTab === 'search' && queryInputRef.current) {
+                    queryInputRef.current.focus();
                 }
             }, [activeTab]);
 
@@ -505,7 +513,7 @@
                                         : 'text-gray-400'
                                 }`}
                             >
-                                <Search className="w-4 h-4" />
+                                <FileText className="w-4 h-4" /> {/* 🌟 修正點：更改 Icon */}
                                 查詢
                             </button>
                             <button
@@ -517,7 +525,7 @@
                                 }`}
                             >
                                 <History />
-                                記錄 ({records.length})
+                                歷史記錄 {/* 🌟 修正點：更改名稱並移除統計數字 */}
                             </button>
                         </div>
                     </div>
@@ -532,7 +540,7 @@
                                     <label className="block text-gray-400 text-sm mb-3">統一編號</label>
                                     <div className="relative">
                                         <input
-                                            ref={searchInputRef} // 🌟 綁定 Ref
+                                            ref={queryInputRef} // 🌟 綁定 Ref 實現自動聚焦
                                             type="text"
                                             value={inputDisplayValue}
                                             readOnly
@@ -636,7 +644,7 @@
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
                             <div>
-                                {/* 1. 操作按鈕 (新增/匯出/匯入) */}
+                                {/* 1. 操作按鈕 (新增/匯出/匯入) - 設置 mb-4 保持 16px 間距 */}
                                 <div className="grid grid-cols-3 gap-3 mb-4">
                                     <button
                                         onClick={() => setIsAdding(true)}
@@ -662,8 +670,9 @@
 
                                 {/* 2. 搜尋框 - 實現置頂固定 (Sticky) */}
                                 <div className="mb-4">
+                                    {/* 🌟 修正點：確保 sticky top-0 z-10 生效 */}
                                     <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
-                                        <div className="relative flex items-center pb-4 pt-0">
+                                        <div className="relative flex items-center py-4">
                                             <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
                                             <input
                                                 type="text"
