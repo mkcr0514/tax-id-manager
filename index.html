@@ -198,6 +198,7 @@
             useEffect(() => {
                 const handleScroll = () => {
                     if (activeTab === 'history') {
+                        // 滾動超過 300px 顯示 Back to Top
                         if (window.scrollY > 300) { 
                             setShowBackToTop(true);
                         } else {
@@ -647,17 +648,16 @@
                                     </label>
                                 </div>
 
-                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/顏色調整 */}
-                                <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
-                                    <div className="relative flex items-center">
-                                        {/* 🌟 修正 Icon 顏色 (text-gray-400) 和位置 (left-6) */}
+                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
+                                {/* 🌟 修正點: 移除 pt-4 和 pb-4，讓 space-y-4 控制間距 */}
+                                <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
+                                    <div className="relative flex items-center py-4"> {/* 🌟 內層 Div 使用 py-4 恢復搜尋框的垂直空間 */}
                                         <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
                                         <input
                                             type="text"
                                             value={historySearchText}
                                             onChange={(e) => setHistorySearchText(e.target.value)}
                                             placeholder="搜尋統編或公司名稱"
-                                            // 調整 padding-left 至 pl-14
                                             className="w-full pl-14 pr-4 py-4 rounded-2xl outline-none focus:border focus:border-blue-500 bg-black/60 border border-gray-700 placeholder:text-gray-500"
                                         />
                                         {historySearchText && (
@@ -671,7 +671,7 @@
                                     </div>
                                 </div>
 
-                                {/* 3. 新增表單 (條件式渲染，它會佔用一個 space-y-4 間距) */}
+                                {/* 3. 新增表單 (間距由外層 space-y-4 控制) */}
                                 {isAdding && (
                                     <div className="glass-card rounded-3xl p-6">
                                         <h2 className="text-xl font-bold mb-4">新增記錄</h2>
@@ -728,7 +728,7 @@
                                     </div>
                                 )}
 
-                                {/* 4. 記錄列表 (它會佔用一個 space-y-4 間距) */}
+                                {/* 4. 記錄列表 (間距由外層 space-y-4 控制) */}
                                 <div className="space-y-3">
                                     {loading ? (
                                         <div className="text-center py-8 text-gray-400">載入中...</div>
