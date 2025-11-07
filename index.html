@@ -8,6 +8,37 @@
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body {
+            background: #0a0a0a;
+        }
+        .glass-card {
+            background: rgba(30, 30, 30, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-button {
+            background: rgba(50, 50, 50, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-button:hover {
+            background: rgba(70, 70, 70, 0.8);
+        }
+        .glass-button:active {
+            background: rgba(90, 90, 90, 1);
+        }
+        .primary-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+        .primary-button:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        }
+        .primary-button:active {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
@@ -16,8 +47,8 @@
         const { useState, useEffect } = React;
 
         // Icons
-        const Search = () => (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        const Search = ({ className = "w-5 h-5" }) => (
+            <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         );
@@ -99,6 +130,10 @@
                 loadRecords();
             }, []);
 
+            useEffect(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, [activeTab]);
+
             const loadRecords = () => {
                 try {
                     const data = localStorage.getItem('taxIdRecords');
@@ -162,6 +197,7 @@
                 if (localRecord) {
                     setSearchResult({ ...localRecord, source: 'local' });
                     setIsSearching(false);
+                    setSearchTaxId('');
                 } else {
                     const apiData = await queryG0vAPI(taxId);
                     setIsSearching(false);
@@ -177,11 +213,14 @@
                                 capital: apiData.data.資本總額 || apiData.data.資本額 || '',
                                 source: 'api'
                             });
+                            setSearchTaxId('');
                         } else {
                             alert('查無此統編資料');
+                            setSearchTaxId('');
                         }
                     } else {
                         alert('查無此統編資料');
+                        setSearchTaxId('');
                     }
                 }
             };
@@ -206,6 +245,8 @@
                 if (saveRecords(newRecords)) {
                     alert('已儲存到記錄');
                     setSearchResult({ ...record, source: 'local' });
+                    setSearchTaxId('');
+                    setSearchResult(null);
                 }
             };
 
@@ -308,7 +349,6 @@
                 event.target.value = '';
             };
 
-            // 數字鍵盤按鈕處理
             const handleNumberClick = (num) => {
                 if (searchTaxId.length < 8) {
                     setSearchTaxId(searchTaxId + num);
@@ -324,7 +364,6 @@
                 setSearchResult(null);
             };
 
-            // 歷史記錄搜尋過濾
             const filteredRecords = records.filter(record => {
                 const searchLower = historySearchText.toLowerCase();
                 return record.taxId.includes(searchLower) || 
@@ -332,61 +371,61 @@
             });
 
             return (
-                <div className="min-h-screen bg-gray-50">
+                <div className="min-h-screen bg-black text-white">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 shadow-lg">
-                        <h1 className="text-2xl font-bold text-center">統編抬頭管理系統</h1>
-                        <p className="text-center text-blue-100 text-sm mt-1">快速查詢與管理客戶統編</p>
+                    <div className="glass-card p-6 rounded-b-3xl">
+                        <h1 className="text-2xl font-bold text-center mb-1">統編抬頭管理</h1>
+                        <p className="text-center text-gray-400 text-sm">Tax ID Manager</p>
                     </div>
 
                     {/* Tabs */}
-                    <div className="bg-white shadow-md sticky top-0 z-10">
-                        <div className="flex">
+                    <div className="px-4 pt-6 pb-4">
+                        <div className="glass-card rounded-full p-1 flex">
                             <button
                                 onClick={() => setActiveTab('search')}
-                                className={`flex-1 py-4 text-center font-semibold transition-colors flex items-center justify-center gap-2 ${
+                                className={`flex-1 py-3 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
                                     activeTab === 'search'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-600 hover:bg-gray-50'
+                                        ? 'primary-button text-white'
+                                        : 'text-gray-400'
                                 }`}
                             >
-                                <Search />
+                                <Search className="w-4 h-4" />
                                 查詢
                             </button>
                             <button
                                 onClick={() => setActiveTab('history')}
-                                className={`flex-1 py-4 text-center font-semibold transition-colors flex items-center justify-center gap-2 ${
+                                className={`flex-1 py-3 rounded-full font-medium transition-all flex items-center justify-center gap-2 ${
                                     activeTab === 'history'
-                                        ? 'bg-blue-600 text-white'
-                                        : 'bg-white text-gray-600 hover:bg-gray-50'
+                                        ? 'primary-button text-white'
+                                        : 'text-gray-400'
                                 }`}
                             >
                                 <History />
-                                歷史記錄 ({records.length})
+                                記錄 ({records.length})
                             </button>
                         </div>
                     </div>
 
-                    {/* Tab Content */}
-                    <div className="p-4">
+                    {/* Content */}
+                    <div className="px-4 pb-32">
                         {/* 查詢頁籤 */}
                         {activeTab === 'search' && (
-                            <div>
-                                {/* 輸入顯示區 */}
-                                <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">統一編號</label>
+                            <div className="space-y-4">
+                                {/* 輸入顯示 */}
+                                <div className="glass-card rounded-3xl p-6">
+                                    <label className="block text-gray-400 text-sm mb-3">統一編號</label>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             value={searchTaxId}
                                             readOnly
-                                            placeholder="請使用下方數字鍵盤輸入"
-                                            className="w-full px-6 py-4 text-2xl font-bold text-center border-2 border-gray-300 rounded-xl bg-gray-50 focus:outline-none focus:border-blue-500"
+                                            placeholder="00000000"
+                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none"
                                         />
                                         {searchTaxId && (
                                             <button
                                                 onClick={handleClear}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
                                             >
                                                 <X />
                                             </button>
@@ -396,27 +435,29 @@
 
                                 {/* 查詢結果 */}
                                 {searchResult && (
-                                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-                                        <div className="flex items-center justify-between mb-3">
-                                            <h3 className="text-xl font-bold text-gray-800">{searchResult.companyName}</h3>
+                                    <div className="glass-card rounded-3xl p-6">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex-1">
+                                                <h3 className="text-xl font-bold mb-2">{searchResult.companyName}</h3>
+                                                <p className="text-blue-400 mb-3">{searchResult.taxId}</p>
+                                            </div>
                                             <span className={`px-3 py-1 text-xs rounded-full ${
                                                 searchResult.source === 'local' 
-                                                    ? 'bg-green-100 text-green-700' 
-                                                    : 'bg-yellow-100 text-yellow-700'
+                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                                                    : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
                                             }`}>
-                                                {searchResult.source === 'local' ? '本地記錄' : 'API 查詢'}
+                                                {searchResult.source === 'local' ? '本地' : 'API'}
                                             </span>
                                         </div>
-                                        <p className="text-gray-600 mb-2">統編：{searchResult.taxId}</p>
-                                        {searchResult.address && <p className="text-sm text-gray-600 mb-2">地址：{searchResult.address}</p>}
-                                        {searchResult.status && <p className="text-sm text-gray-600 mb-2">狀態：{searchResult.status}</p>}
-                                        {searchResult.capital && <p className="text-sm text-gray-600 mb-2">資本額：{searchResult.capital}</p>}
-                                        {searchResult.note && <p className="text-sm text-gray-600 mb-2">備註：{searchResult.note}</p>}
+                                        {searchResult.address && <p className="text-sm text-gray-400 mb-2">📍 {searchResult.address}</p>}
+                                        {searchResult.status && <p className="text-sm text-gray-400 mb-2">📊 {searchResult.status}</p>}
+                                        {searchResult.capital && <p className="text-sm text-gray-400 mb-2">💰 {searchResult.capital}</p>}
+                                        {searchResult.note && <p className="text-sm text-gray-400 mb-2">📝 {searchResult.note}</p>}
                                         
                                         {searchResult.source === 'api' && (
                                             <button
                                                 onClick={handleSaveFromSearch}
-                                                className="w-full mt-4 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                                                className="w-full mt-4 py-4 primary-button text-white rounded-2xl font-semibold flex items-center justify-center gap-2"
                                             >
                                                 <Save />
                                                 儲存到記錄
@@ -426,13 +467,13 @@
                                 )}
 
                                 {/* 數字鍵盤 */}
-                                <div className="bg-white rounded-2xl shadow-lg p-4">
+                                <div className="glass-card rounded-3xl p-4">
                                     <div className="grid grid-cols-3 gap-3 mb-3">
                                         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(num => (
                                             <button
                                                 key={num}
                                                 onClick={() => handleNumberClick(num.toString())}
-                                                className="aspect-square bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-2xl text-3xl font-bold text-gray-800 transition-colors shadow-md"
+                                                className="aspect-square glass-button rounded-2xl text-2xl font-bold hover:scale-95 active:scale-90 transition-all"
                                             >
                                                 {num}
                                             </button>
@@ -441,20 +482,20 @@
                                     <div className="grid grid-cols-3 gap-3">
                                         <button
                                             onClick={handleBackspace}
-                                            className="aspect-square bg-red-100 hover:bg-red-200 active:bg-red-300 rounded-2xl flex items-center justify-center transition-colors shadow-md"
+                                            className="aspect-square glass-button rounded-2xl flex items-center justify-center hover:scale-95 active:scale-90 transition-all text-red-400"
                                         >
                                             <Delete />
                                         </button>
                                         <button
                                             onClick={() => handleNumberClick('0')}
-                                            className="aspect-square bg-gray-100 hover:bg-gray-200 active:bg-gray-300 rounded-2xl text-3xl font-bold text-gray-800 transition-colors shadow-md"
+                                            className="aspect-square glass-button rounded-2xl text-2xl font-bold hover:scale-95 active:scale-90 transition-all"
                                         >
                                             0
                                         </button>
                                         <button
                                             onClick={handleSearch}
                                             disabled={isSearching || searchTaxId.length !== 8}
-                                            className="aspect-square bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-gray-300 text-white rounded-2xl flex items-center justify-center transition-colors shadow-md"
+                                            className="aspect-square primary-button rounded-2xl flex items-center justify-center disabled:opacity-30 hover:scale-95 active:scale-90 transition-all"
                                         >
                                             {isSearching ? <RefreshCw /> : <Search />}
                                         </button>
@@ -465,12 +506,12 @@
 
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
-                            <div>
+                            <div className="space-y-4">
                                 {/* 操作按鈕 */}
-                                <div className="grid grid-cols-3 gap-3 mb-4">
+                                <div className="grid grid-cols-3 gap-3">
                                     <button
                                         onClick={() => setIsAdding(true)}
-                                        className="py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors flex flex-col items-center justify-center gap-1 shadow-md"
+                                        className="glass-button rounded-2xl py-4 font-medium flex flex-col items-center justify-center gap-2 hover:scale-95 active:scale-90 transition-all"
                                     >
                                         <Plus />
                                         <span className="text-xs">新增</span>
@@ -478,12 +519,12 @@
                                     <button
                                         onClick={exportData}
                                         disabled={records.length === 0}
-                                        className="py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 disabled:bg-gray-300 transition-colors flex flex-col items-center justify-center gap-1 shadow-md"
+                                        className="glass-button rounded-2xl py-4 font-medium flex flex-col items-center justify-center gap-2 hover:scale-95 active:scale-90 transition-all disabled:opacity-30"
                                     >
                                         <Download />
                                         <span className="text-xs">匯出</span>
                                     </button>
-                                    <label className="py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex flex-col items-center justify-center gap-1 cursor-pointer shadow-md">
+                                    <label className="glass-button rounded-2xl py-4 font-medium flex flex-col items-center justify-center gap-2 hover:scale-95 active:scale-90 transition-all cursor-pointer">
                                         <Upload />
                                         <span className="text-xs">匯入</span>
                                         <input type="file" accept=".json" onChange={importData} className="hidden" />
@@ -491,67 +532,67 @@
                                 </div>
 
                                 {/* 搜尋框 */}
-                                <div className="mb-4">
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={historySearchText}
-                                            onChange={(e) => setHistorySearchText(e.target.value)}
-                                            placeholder="搜尋統編或公司名稱..."
-                                            className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
-                                        />
-                                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                                        {historySearchText && (
-                                            <button
-                                                onClick={() => setHistorySearchText('')}
-                                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-                                            >
-                                                <X />
-                                            </button>
-                                        )}
+                                <div className="relative flex items-center">
+                                    <div className="absolute left-4 pointer-events-none text-gray-400">
+                                        <Search />
                                     </div>
+                                    <input
+                                        type="text"
+                                        value={historySearchText}
+                                        onChange={(e) => setHistorySearchText(e.target.value)}
+                                        placeholder="搜尋統編或公司名稱"
+                                        className="w-full pl-12 pr-12 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500"
+                                    />
+                                    {historySearchText && (
+                                        <button
+                                            onClick={() => setHistorySearchText('')}
+                                            className="absolute right-4 text-gray-400 hover:text-white"
+                                        >
+                                            <X />
+                                        </button>
+                                    )}
                                 </div>
 
-                                {/* 新增記錄表單 */}
+                                {/* 新增表單 */}
                                 {isAdding && (
-                                    <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-                                        <h2 className="text-xl font-bold text-gray-800 mb-4">新增記錄</h2>
+                                    <div className="glass-card rounded-3xl p-6">
+                                        <h2 className="text-xl font-bold mb-4">新增記錄</h2>
                                         <div className="space-y-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">統一編號 *</label>
+                                                <label className="block text-gray-400 text-sm mb-2">統一編號 *</label>
                                                 <input
                                                     type="text"
                                                     value={newRecord.taxId}
                                                     onChange={(e) => setNewRecord({ ...newRecord, taxId: e.target.value })}
                                                     placeholder="8位數字"
                                                     maxLength="8"
-                                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
+                                                    className="w-full px-4 py-3 bg-black/50 rounded-xl border border-gray-700 focus:border-blue-500 outline-none"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">公司抬頭 *</label>
+                                                <label className="block text-gray-400 text-sm mb-2">公司抬頭 *</label>
                                                 <input
                                                     type="text"
                                                     value={newRecord.companyName}
                                                     onChange={(e) => setNewRecord({ ...newRecord, companyName: e.target.value })}
                                                     placeholder="完整公司名稱"
-                                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
+                                                    className="w-full px-4 py-3 bg-black/50 rounded-xl border border-gray-700 focus:border-blue-500 outline-none"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                                                <label className="block text-gray-400 text-sm mb-2">備註</label>
                                                 <textarea
                                                     value={newRecord.note}
                                                     onChange={(e) => setNewRecord({ ...newRecord, note: e.target.value })}
                                                     placeholder="選填"
                                                     rows={2}
-                                                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
+                                                    className="w-full px-4 py-3 bg-black/50 rounded-xl border border-gray-700 focus:border-blue-500 outline-none"
                                                 />
                                             </div>
                                             <div className="flex gap-3">
                                                 <button
                                                     onClick={handleAddRecord}
-                                                    className="flex-1 py-3 bg-green-600 text-white rounded-xl font-semibold hover:bg-green-700 transition-colors"
+                                                    className="flex-1 py-3 primary-button rounded-xl font-semibold"
                                                 >
                                                     儲存
                                                 </button>
@@ -560,7 +601,7 @@
                                                         setIsAdding(false);
                                                         setNewRecord({ taxId: '', companyName: '', note: '' });
                                                     }}
-                                                    className="flex-1 py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-colors"
+                                                    className="flex-1 py-3 glass-button rounded-xl font-semibold"
                                                 >
                                                     取消
                                                 </button>
@@ -572,45 +613,45 @@
                                 {/* 記錄列表 */}
                                 <div className="space-y-3">
                                     {loading ? (
-                                        <div className="text-center py-8 text-gray-500">載入中...</div>
+                                        <div className="text-center py-8 text-gray-400">載入中...</div>
                                     ) : filteredRecords.length === 0 ? (
-                                        <div className="text-center py-8 text-gray-500">
+                                        <div className="text-center py-8 text-gray-400">
                                             {historySearchText ? '查無相關記錄' : '尚無記錄'}
                                         </div>
                                     ) : (
                                         filteredRecords.map((record) => (
-                                            <div key={record.taxId} className="bg-white rounded-2xl shadow-md p-4">
+                                            <div key={record.taxId} className="glass-card rounded-2xl p-4">
                                                 {editingId === record.taxId ? (
                                                     <div className="space-y-3">
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-1">公司抬頭 *</label>
+                                                            <label className="block text-gray-400 text-sm mb-2">公司抬頭 *</label>
                                                             <input
                                                                 type="text"
                                                                 value={editForm.companyName}
                                                                 onChange={(e) => setEditForm({ ...editForm, companyName: e.target.value })}
-                                                                className="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
+                                                                className="w-full px-3 py-2 bg-black/50 rounded-xl border border-gray-700 focus:border-blue-500 outline-none"
                                                             />
                                                         </div>
                                                         <div>
-                                                            <label className="block text-sm font-medium text-gray-700 mb-1">備註</label>
+                                                            <label className="block text-gray-400 text-sm mb-2">備註</label>
                                                             <textarea
                                                                 value={editForm.note || ''}
                                                                 onChange={(e) => setEditForm({ ...editForm, note: e.target.value })}
                                                                 rows={2}
-                                                                className="w-full px-3 py-2 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-blue-500"
+                                                                className="w-full px-3 py-2 bg-black/50 rounded-xl border border-gray-700 focus:border-blue-500 outline-none"
                                                             />
                                                         </div>
                                                         <div className="flex gap-2">
                                                             <button
                                                                 onClick={handleUpdateRecord}
-                                                                className="flex-1 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                                                className="flex-1 py-2 primary-button rounded-xl font-semibold flex items-center justify-center gap-2"
                                                             >
                                                                 <Save />
                                                                 儲存
                                                             </button>
                                                             <button
                                                                 onClick={cancelEdit}
-                                                                className="flex-1 py-2 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition-colors flex items-center justify-center gap-2"
+                                                                className="flex-1 py-2 glass-button rounded-xl font-semibold flex items-center justify-center gap-2"
                                                             >
                                                                 <X />
                                                                 取消
@@ -620,25 +661,27 @@
                                                 ) : (
                                                     <div>
                                                         <div className="flex items-start justify-between mb-2">
-                                                            <h3 className="text-lg font-bold text-gray-800 flex-1">{record.companyName}</h3>
+                                                            <div className="flex-1">
+                                                                <h3 className="text-lg font-bold mb-1">{record.companyName}</h3>
+                                                                <p className="text-blue-400 text-sm">{record.taxId}</p>
+                                                            </div>
                                                             <div className="flex gap-2 ml-2">
                                                                 <button
                                                                     onClick={() => startEdit(record)}
-                                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                                    className="p-2 glass-button rounded-lg text-blue-400 hover:scale-95 transition-all"
                                                                 >
                                                                     <Edit2 />
                                                                 </button>
                                                                 <button
                                                                     onClick={() => deleteRecord(record.taxId)}
-                                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                                    className="p-2 glass-button rounded-lg text-red-400 hover:scale-95 transition-all"
                                                                 >
                                                                     <Trash2 />
                                                                 </button>
                                                             </div>
                                                         </div>
-                                                        <p className="text-gray-600 mb-1">統編：{record.taxId}</p>
-                                                        {record.address && <p className="text-sm text-gray-600 mb-1">地址：{record.address}</p>}
-                                                        {record.note && <p className="text-sm text-gray-600">備註：{record.note}</p>}
+                                                        {record.address && <p className="text-sm text-gray-400 mb-1">📍 {record.address}</p>}
+                                                        {record.note && <p className="text-sm text-gray-400">📝 {record.note}</p>}
                                                     </div>
                                                 )}
                                             </div>
@@ -650,9 +693,9 @@
                     </div>
 
                     {/* Footer */}
-                    <div className="p-4 text-center text-sm text-gray-500">
+                    <div className="p-6 text-center text-xs text-gray-500">
                         <p>資料來源：g0v 統編查詢 API</p>
-                        <p className="mt-1">資料儲存在瀏覽器本地</p>
+                        <p className="mt-1">資料儲存於瀏覽器本地</p>
                     </div>
                 </div>
             );
