@@ -186,7 +186,7 @@
             const [editingId, setEditingId] = useState(null);
             const [newRecord, setNewRecord] = useState({ taxId: '', companyName: '', note: '' });
             const [loading, setLoading] = useState(true);
-            const [editForm, setEditForm] = useState({}); // 修正：確保使用 useState 初始化
+            const [editForm, setEditForm] = useState({});
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
@@ -621,8 +621,9 @@
 
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
+                            // 🌟 Content 容器使用 space-y-4 來統一間距
                             <div className="space-y-4">
-                                {/* 操作按鈕 */}
+                                {/* 1. 操作按鈕 (新增/匯出/匯入) */}
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
                                         onClick={() => setIsAdding(true)}
@@ -646,10 +647,10 @@
                                     </label>
                                 </div>
 
-                                {/* 🌟 搜尋框 - 實現置頂固定 (Sticky) UI/顏色調整 */}
+                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/顏色調整 */}
                                 <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
                                     <div className="relative flex items-center">
-                                        {/* 🌟 Icon 調整：左側距離 (left-6) 顏色 (text-gray-400) */}
+                                        {/* 🌟 修正 Icon 顏色 (text-gray-400) 和位置 (left-6) */}
                                         <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
                                         <input
                                             type="text"
@@ -670,7 +671,7 @@
                                     </div>
                                 </div>
 
-                                {/* 新增表單 */}
+                                {/* 3. 新增表單 (條件式渲染，它會佔用一個 space-y-4 間距) */}
                                 {isAdding && (
                                     <div className="glass-card rounded-3xl p-6">
                                         <h2 className="text-xl font-bold mb-4">新增記錄</h2>
@@ -727,7 +728,7 @@
                                     </div>
                                 )}
 
-                                {/* 記錄列表 */}
+                                {/* 4. 記錄列表 (它會佔用一個 space-y-4 間距) */}
                                 <div className="space-y-3">
                                     {loading ? (
                                         <div className="text-center py-8 text-gray-400">載入中...</div>
