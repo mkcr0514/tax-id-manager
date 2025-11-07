@@ -525,7 +525,8 @@
                                             value={inputDisplayValue}
                                             readOnly
                                             placeholder="請使用下方數字鍵盤輸入統一編號"
-                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none placeholder:text-gray-600 placeholder:text-lg"
+                                            // 🌟 修正點：移除邊框和聚焦樣式
+                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl outline-none placeholder:text-gray-600 placeholder:text-lg"
                                         />
                                         {inputDisplayValue && (
                                             <button
@@ -648,10 +649,9 @@
                                 </div>
 
                                 {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
-                                {/* 🌟 修正點: 搜尋框容器使用 mb-4 控制下方間距，且因為是 sticky 元素，需要包裝一層來隔離定位樣式 */}
                                 <div className="mb-4">
                                     <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
-                                        <div className="relative flex items-center py-4">
+                                        <div className="relative flex items-center pb-4 pt-0">
                                             <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
                                             <input
                                                 type="text"
