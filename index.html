@@ -198,6 +198,7 @@
             useEffect(() => {
                 const handleScroll = () => {
                     if (activeTab === 'history') {
+                        // 滾動超過 300px 顯示 Back to Top
                         if (window.scrollY > 300) { 
                             setShowBackToTop(true);
                         } else {
@@ -440,7 +441,7 @@
             };
 
             const handleNumberClick = (num) => {
-                // 🌟 點擊鍵盤時，自動捲動到頂部 (Tab位置)
+                // 點擊鍵盤時，自動捲動到頂部 (Tab位置)
                 scrollToTop();
 
                 // 如果有搜尋結果，先清空再輸入
@@ -496,7 +497,7 @@
                                         : 'text-gray-400'
                                 }`}
                             >
-                                <Search className="w-4 h-4" />
+                                {/* 🌟 移除查詢頁籤的 Search Icon */}
                                 查詢
                             </button>
                             <button
@@ -527,7 +528,6 @@
                                             value={inputDisplayValue}
                                             readOnly
                                             placeholder="請使用下方數字鍵盤輸入統一編號"
-                                            // 🌟 移除 autoFocus 屬性
                                             className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none placeholder:text-gray-600 placeholder:text-lg"
                                         />
                                         {inputDisplayValue && (
@@ -651,8 +651,7 @@
                                     </label>
                                 </div>
 
-                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
-                                {/* 🌟 修正點: 移除 pt-4/pb-4，讓 space-y-4 控制垂直間距。背景使用 bg-black 確保置頂平順。 */}
+                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) */}
                                 <div className="sticky top-0 z-10 -mx-4 px-4 bg-black border-b border-gray-800 shadow-xl"> 
                                     <div className="relative flex items-center py-4">
                                         <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
