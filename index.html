@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>統編抬頭管理系統</title>
+    <title>公司抬頭及統編查詢</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -117,6 +117,7 @@
             const [activeTab, setActiveTab] = useState('search');
             const [records, setRecords] = useState([]);
             const [searchTaxId, setSearchTaxId] = useState('');
+            const [displayTaxId, setDisplayTaxId] = useState(''); // 用於顯示查詢結果時的統編
             const [searchResult, setSearchResult] = useState(null);
             const [isSearching, setIsSearching] = useState(false);
             const [isAdding, setIsAdding] = useState(false);
@@ -165,7 +166,6 @@
                 if (!confirm('確定要刪除這筆記錄嗎？')) return;
                 const newRecords = records.filter(r => r.taxId !== taxId);
                 saveRecords(newRecords);
-                setSearchResult(null);
             };
 
             const queryG0vAPI = async (taxId) => {
@@ -196,8 +196,9 @@
                 
                 if (localRecord) {
                     setSearchResult({ ...localRecord, source: 'local' });
+                    setDisplayTaxId(taxId); // 保留查詢內容
+                    setSearchTaxId(''); // 清空輸入狀態，但顯示用 displayTaxId
                     setIsSearching(false);
-                    setSearchTaxId('');
                 } else {
                     const apiData = await queryG0vAPI(taxId);
                     setIsSearching(false);
@@ -213,14 +214,13 @@
                                 capital: apiData.data.資本總額 || apiData.data.資本額 || '',
                                 source: 'api'
                             });
-                            setSearchTaxId('');
+                            setDisplayTaxId(taxId); // 保留查詢內容
+                            setSearchTaxId(''); // 清空輸入狀態
                         } else {
                             alert('查無此統編資料');
-                            setSearchTaxId('');
                         }
                     } else {
                         alert('查無此統編資料');
-                        setSearchTaxId('');
                     }
                 }
             };
@@ -245,6 +245,7 @@
                 if (saveRecords(newRecords)) {
                     alert('已儲存到記錄');
                     setSearchResult({ ...record, source: 'local' });
+                    setDisplayTaxId('');
                     setSearchTaxId('');
                     setSearchResult(null);
                 }
@@ -361,6 +362,7 @@
 
             const handleClear = () => {
                 setSearchTaxId('');
+                setDisplayTaxId('');
                 setSearchResult(null);
             };
 
@@ -370,16 +372,18 @@
                        record.companyName.toLowerCase().includes(searchLower);
             });
 
+            // 決定輸入框顯示的內容
+            const inputDisplayValue = displayTaxId || searchTaxId;
+
             return (
                 <div className="min-h-screen bg-black text-white">
                     {/* Header */}
-                    <div className="glass-card p-6 rounded-b-3xl">
-                        <h1 className="text-2xl font-bold text-center mb-1">統編抬頭管理</h1>
-                        <p className="text-center text-gray-400 text-sm">Tax ID Manager</p>
+                    <div className="p-6 pb-4">
+                        <h1 className="text-2xl font-bold text-center">公司抬頭及統編查詢</h1>
                     </div>
 
                     {/* Tabs */}
-                    <div className="px-4 pt-6 pb-4">
+                    <div className="px-4 pt-2 pb-4">
                         <div className="glass-card rounded-full p-1 flex">
                             <button
                                 onClick={() => setActiveTab('search')}
@@ -417,12 +421,12 @@
                                     <div className="relative">
                                         <input
                                             type="text"
-                                            value={searchTaxId}
+                                            value={inputDisplayValue}
                                             readOnly
-                                            placeholder="00000000"
-                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none"
+                                            placeholder="請使用下方數字鍵盤輸入統一編號"
+                                            className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none placeholder:text-gray-600 placeholder:text-lg"
                                         />
-                                        {searchTaxId && (
+                                        {inputDisplayValue && (
                                             <button
                                                 onClick={handleClear}
                                                 className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
