@@ -139,7 +139,7 @@
                 >
                     <div 
                         className="glass-card rounded-3xl p-6 m-4 max-w-sm w-full relative"
-                        onClick={(e) => e.stopPropagation()} // 防止點擊 Modal 內容時關閉
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-3">公司資訊</h2>
                         <div className="space-y-4">
@@ -179,7 +179,7 @@
             const [activeTab, setActiveTab] = useState('search');
             const [records, setRecords] = useState([]);
             const [searchTaxId, setSearchTaxId] = useState('');
-            const [displayTaxId, setDisplayTaxId] = useState(''); // 用於顯示查詢結果時的統編
+            const [displayTaxId, setDisplayTaxId] = useState('');
             const [searchResult, setSearchResult] = useState(null);
             const [isSearching, setIsSearching] = useState(false);
             const [isAdding, setIsAdding] = useState(false);
@@ -188,7 +188,7 @@
             const [loading, setLoading] = useState(true);
             const [editForm, setEditForm] = useState({});
             const [historySearchText, setHistorySearchText] = useState('');
-            const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
+            const [modalContent, setModalContent] = useState(null);
             const [showBackToTop, setShowBackToTop] = useState(false);
 
             useEffect(() => {
@@ -198,7 +198,6 @@
             useEffect(() => {
                 const handleScroll = () => {
                     if (activeTab === 'history') {
-                        // 滾動超過 300px 顯示 Back to Top
                         if (window.scrollY > 300) { 
                             setShowBackToTop(true);
                         } else {
@@ -307,7 +306,6 @@
                 }
             };
 
-            // 清除全部內容的函式
             const handleClearAll = () => {
                 setSearchTaxId('');
                 setDisplayTaxId('');
@@ -441,10 +439,8 @@
             };
 
             const handleNumberClick = (num) => {
-                // 點擊鍵盤時，自動捲動到頂部 (Tab位置)
                 scrollToTop();
 
-                // 如果有搜尋結果，先清空再輸入
                 if (searchResult) {
                     handleClearAll();
                     setSearchTaxId(num);
@@ -471,10 +467,7 @@
                        record.companyName.toLowerCase().includes(searchLower);
             });
 
-            // 決定輸入框顯示的內容
             const inputDisplayValue = displayTaxId || searchTaxId;
-            
-            // 判斷左下角按鈕狀態
             const isSearchResultPresent = !!searchResult;
 
             return (
@@ -486,8 +479,8 @@
                         <h1 className="text-2xl font-bold text-center">公司抬頭及統編查詢</h1>
                     </div>
 
-                    {/* Tabs */}
-                    <div className="px-4 pt-2 pb-4">
+                    {/* Tabs - 調整 padding 統一間距 */}
+                    <div className="px-4 pb-4">
                         <div className="glass-card rounded-full p-1 flex">
                             <button
                                 onClick={() => setActiveTab('search')}
@@ -497,7 +490,6 @@
                                         : 'text-gray-400'
                                 }`}
                             >
-                                {/* 🌟 移除查詢頁籤的 Search Icon */}
                                 查詢
                             </button>
                             <button
@@ -508,8 +500,7 @@
                                         : 'text-gray-400'
                                 }`}
                             >
-                                <History />
-                                記錄 ({records.length})
+                                記錄
                             </button>
                         </div>
                     </div>
@@ -532,7 +523,6 @@
                                         />
                                         {inputDisplayValue && (
                                             <button
-                                                // 放大點擊範圍: p-2
                                                 onClick={handleClearAll}
                                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-2"
                                             >
@@ -593,7 +583,6 @@
                                     </div>
                                     <div className="grid grid-cols-3 gap-3">
                                         <button
-                                            // 根據狀態切換功能 (Backspace / Clear All)
                                             onClick={isSearchResultPresent ? handleClearAll : handleBackspace}
                                             className={`aspect-square glass-button rounded-2xl flex items-center justify-center hover:scale-95 active:scale-90 transition-all ${isSearchResultPresent ? 'text-blue-400' : 'text-red-400'}`}
                                         >
@@ -625,9 +614,8 @@
 
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
-                            // Content 容器使用 space-y-4 來統一間距
                             <div className="space-y-4">
-                                {/* 1. 操作按鈕 (新增/匯出/匯入) */}
+                                {/* 操作按鈕 - 間距調整為 4 */}
                                 <div className="grid grid-cols-3 gap-3">
                                     <button
                                         onClick={() => setIsAdding(true)}
@@ -651,7 +639,7 @@
                                     </label>
                                 </div>
 
-                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) */}
+                                {/* 搜尋框 - 調整為 4 的間距 */}
                                 <div className="sticky top-0 z-10 -mx-4 px-4 bg-black border-b border-gray-800 shadow-xl"> 
                                     <div className="relative flex items-center py-4">
                                         <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
@@ -673,7 +661,7 @@
                                     </div>
                                 </div>
 
-                                {/* 3. 新增表單 */}
+                                {/* 新增表單 */}
                                 {isAdding && (
                                     <div className="glass-card rounded-3xl p-6">
                                         <h2 className="text-xl font-bold mb-4">新增記錄</h2>
@@ -730,7 +718,7 @@
                                     </div>
                                 )}
 
-                                {/* 4. 記錄列表 */}
+                                {/* 記錄列表 */}
                                 <div className="space-y-3">
                                     {loading ? (
                                         <div className="text-center py-8 text-gray-400">載入中...</div>
