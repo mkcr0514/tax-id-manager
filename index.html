@@ -129,7 +129,8 @@
                         className="glass-card rounded-3xl p-6 m-4 max-w-sm w-full relative"
                         onClick={(e) => e.stopPropagation()} // 防止點擊 Modal 內容時關閉
                     >
-                        <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-3">公司資訊 (放大)</h2>
+                        {/* 🌟 調整 Modal 標題為 "公司資訊" */}
+                        <h2 className="text-xl font-bold mb-4 border-b border-gray-700 pb-3">公司資訊</h2>
                         <div className="space-y-4">
                             <div>
                                 <p className="text-gray-400 text-sm mb-1">公司抬頭</p>
@@ -601,17 +602,15 @@
                                     </label>
                                 </div>
 
-                                {/* 搜尋框 - 修正 Icon 顯示問題 */}
+                                {/* 搜尋框 - 🌟 移除 Icon 和相關樣式 */}
                                 <div className="relative flex items-center">
-                                    <div className="absolute left-4 text-gray-400">
-                                        <Search />
-                                    </div>
+                                    {/* 移除 Search Icon 元素 */}
                                     <input
                                         type="text"
                                         value={historySearchText}
                                         onChange={(e) => setHistorySearchText(e.target.value)}
                                         placeholder="搜尋統編或公司名稱"
-                                        className="w-full pl-12 pr-12 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500"
+                                        className="w-full px-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500"
                                     />
                                     {historySearchText && (
                                         <button
