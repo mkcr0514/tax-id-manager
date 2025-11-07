@@ -439,16 +439,36 @@
             };
 
             const handleNumberClick = (num) => {
-                scrollToTop();
-
-                if (searchResult) {
-                    handleClearAll();
-                    setSearchTaxId(num);
-                } else if (searchTaxId.length < 8) {
-                    setSearchTaxId(searchTaxId + num);
+    // 如果有搜尋結果，先清空再輸入
+    if (searchResult) {
+        handleClearAll();
+        setSearchTaxId(num);
+        // 輸入第一個數字後滾動
+        setTimeout(() => {
+            const inputElement = document.querySelector('input[readonly]');
+            if (inputElement) {
+                const elementPosition = inputElement.getBoundingClientRect().top + window.scrollY;
+                const offsetPosition = elementPosition - 80; // 留一些上方空間
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+        }, 100);
+    } else if (searchTaxId.length < 8) {
+        const isFirstDigit = searchTaxId.length === 0;
+        setSearchTaxId(searchTaxId + num);
+        
+        // 如果是第一個數字，自動滾動到輸入框
+        if (isFirstDigit) {
+            setTimeout(() => {
+                const inputElement = document.querySelector('input[readonly]');
+                if (inputElement) {
+                    const elementPosition = inputElement.getBoundingClientRect().top + window.scrollY;
+                    const offsetPosition = elementPosition - 80; // 留一些上方空間（考慮標題高度）
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                 }
-            };
-
+            }, 100);
+        }
+    }
+};
             const handleBackspace = () => {
                 setSearchTaxId(searchTaxId.slice(0, -1));
             };
