@@ -47,7 +47,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        const { useState, useEffect } = React;
 
         // Icons
         const Search = ({ className = "w-5 h-5" }) => (
@@ -55,14 +55,6 @@
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
         );
-        
-        // 🌟 新增 Document/File Icon 給查詢頁籤
-        const FileText = ({ className = "w-4 h-4" }) => (
-             <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m-6-4v4m3-4v4m-3-4h.01M17 19H7a2 2 0 01-2-2V7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2z" />
-             </svg>
-        );
-
 
         const History = () => (
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,9 +190,6 @@
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
-            
-            // 🌟 創建 Ref 來指向查詢輸入框
-            const queryInputRef = useRef(null);
 
             useEffect(() => {
                 loadRecords();
@@ -209,7 +198,6 @@
             useEffect(() => {
                 const handleScroll = () => {
                     if (activeTab === 'history') {
-                        // 滾動超過 300px 顯示 Back to Top
                         if (window.scrollY > 300) { 
                             setShowBackToTop(true);
                         } else {
@@ -223,14 +211,6 @@
                 window.addEventListener('scroll', handleScroll);
                 return () => window.removeEventListener('scroll', handleScroll);
             }, [activeTab]); 
-            
-            // 🌟 處理查詢頁籤自動聚焦
-            useEffect(() => {
-                if (activeTab === 'search' && queryInputRef.current) {
-                    queryInputRef.current.focus();
-                }
-            }, [activeTab]);
-
 
             const scrollToTop = () => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -460,6 +440,9 @@
             };
 
             const handleNumberClick = (num) => {
+                // 🌟 點擊鍵盤時，自動捲動到頂部 (Tab位置)
+                scrollToTop();
+
                 // 如果有搜尋結果，先清空再輸入
                 if (searchResult) {
                     handleClearAll();
@@ -513,7 +496,7 @@
                                         : 'text-gray-400'
                                 }`}
                             >
-                                <FileText className="w-4 h-4" /> {/* 🌟 修正點：更改 Icon */}
+                                <Search className="w-4 h-4" />
                                 查詢
                             </button>
                             <button
@@ -525,7 +508,7 @@
                                 }`}
                             >
                                 <History />
-                                歷史記錄 {/* 🌟 修正點：更改名稱並移除統計數字 */}
+                                記錄 ({records.length})
                             </button>
                         </div>
                     </div>
@@ -540,12 +523,11 @@
                                     <label className="block text-gray-400 text-sm mb-3">統一編號</label>
                                     <div className="relative">
                                         <input
-                                            ref={queryInputRef} // 🌟 綁定 Ref 實現自動聚焦
                                             type="text"
                                             value={inputDisplayValue}
                                             readOnly
                                             placeholder="請使用下方數字鍵盤輸入統一編號"
-                                            // 🌟 修正點：還原框線樣式
+                                            // 🌟 移除 autoFocus 屬性
                                             className="w-full px-6 py-5 text-3xl font-bold text-center bg-black/50 rounded-2xl border border-gray-700 focus:border-blue-500 outline-none placeholder:text-gray-600 placeholder:text-lg"
                                         />
                                         {inputDisplayValue && (
@@ -643,9 +625,10 @@
 
                         {/* 歷史記錄頁籤 */}
                         {activeTab === 'history' && (
-                            <div>
-                                {/* 1. 操作按鈕 (新增/匯出/匯入) - 設置 mb-4 保持 16px 間距 */}
-                                <div className="grid grid-cols-3 gap-3 mb-4">
+                            // Content 容器使用 space-y-4 來統一間距
+                            <div className="space-y-4">
+                                {/* 1. 操作按鈕 (新增/匯出/匯入) */}
+                                <div className="grid grid-cols-3 gap-3">
                                     <button
                                         onClick={() => setIsAdding(true)}
                                         className="glass-button rounded-2xl py-4 font-medium flex flex-col items-center justify-center gap-2 hover:scale-95 active:scale-90 transition-all"
@@ -668,34 +651,32 @@
                                     </label>
                                 </div>
 
-                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) */}
-                                <div className="mb-4">
-                                    {/* 🌟 修正點：確保 sticky top-0 z-10 生效 */}
-                                    <div className="sticky top-0 z-10 -mx-4 px-4 bg-black/90 backdrop-blur-md border-b border-gray-800 shadow-xl"> 
-                                        <div className="relative flex items-center py-4">
-                                            <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
-                                            <input
-                                                type="text"
-                                                value={historySearchText}
-                                                onChange={(e) => setHistorySearchText(e.target.value)}
-                                                placeholder="搜尋統編或公司名稱"
-                                                className="w-full pl-14 pr-4 py-4 rounded-2xl outline-none focus:border focus:border-blue-500 bg-black/60 border border-gray-700 placeholder:text-gray-500"
-                                            />
-                                            {historySearchText && (
-                                                <button
-                                                    onClick={() => setHistorySearchText('')}
-                                                    className="absolute right-7 text-gray-400 hover:text-white"
-                                                >
-                                                    <X />
-                                                </button>
-                                            )}
-                                        </div>
+                                {/* 2. 搜尋框 - 實現置頂固定 (Sticky) UI/間距修正 */}
+                                {/* 🌟 修正點: 移除 pt-4/pb-4，讓 space-y-4 控制垂直間距。背景使用 bg-black 確保置頂平順。 */}
+                                <div className="sticky top-0 z-10 -mx-4 px-4 bg-black border-b border-gray-800 shadow-xl"> 
+                                    <div className="relative flex items-center py-4">
+                                        <Search className="w-5 h-5 absolute left-6 text-gray-400 pointer-events-none" />
+                                        <input
+                                            type="text"
+                                            value={historySearchText}
+                                            onChange={(e) => setHistorySearchText(e.target.value)}
+                                            placeholder="搜尋統編或公司名稱"
+                                            className="w-full pl-14 pr-4 py-4 rounded-2xl outline-none focus:border focus:border-blue-500 bg-black/60 border border-gray-700 placeholder:text-gray-500"
+                                        />
+                                        {historySearchText && (
+                                            <button
+                                                onClick={() => setHistorySearchText('')}
+                                                className="absolute right-7 text-gray-400 hover:text-white"
+                                            >
+                                                <X />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
-                                {/* 3. 新增表單 (條件式渲染，使用 mb-4 統一間距) */}
+                                {/* 3. 新增表單 */}
                                 {isAdding && (
-                                    <div className="glass-card rounded-3xl p-6 mb-4">
+                                    <div className="glass-card rounded-3xl p-6">
                                         <h2 className="text-xl font-bold mb-4">新增記錄</h2>
                                         <div className="space-y-4">
                                             <div>
@@ -750,7 +731,7 @@
                                     </div>
                                 )}
 
-                                {/* 4. 記錄列表 (內部使用 space-y-3，整體不需額外 mb/mt) */}
+                                {/* 4. 記錄列表 */}
                                 <div className="space-y-3">
                                     {loading ? (
                                         <div className="text-center py-8 text-gray-400">載入中...</div>
