@@ -41,6 +41,10 @@
         .modal-overlay {
             background-color: rgba(0, 0, 0, 0.7);
         }
+        /* 由於 Tailwind 預設沒有 pl-13，我們手動加入 */
+        .pl-13 {
+            padding-left: 3.25rem; /* 52px */
+        }
     </style>
 </head>
 <body>
@@ -116,7 +120,6 @@
             </svg>
         );
         
-        // 🌟 新增清除所有內容的 Icon
         const ClearAll = () => (
              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -187,7 +190,7 @@
             const [editingId, setEditingId] = useState(null);
             const [newRecord, setNewRecord] = useState({ taxId: '', companyName: '', note: '' });
             const [loading, setLoading] = useState(true);
-            const [editForm, setEditForm] = useState({});
+            const [editForm, setEditForm] = {};
             const [historySearchText, setHistorySearchText] = useState('');
             const [modalContent, setModalContent] = useState(null); // Modal 內容 { taxId, companyName, note }
             const [showBackToTop, setShowBackToTop] = useState(false);
@@ -307,7 +310,7 @@
                 }
             };
 
-            // 🌟 清除全部內容的函式
+            // 清除全部內容的函式
             const handleClearAll = () => {
                 setSearchTaxId('');
                 setDisplayTaxId('');
@@ -471,7 +474,7 @@
             // 決定輸入框顯示的內容
             const inputDisplayValue = displayTaxId || searchTaxId;
             
-            // 🌟 判斷左下角按鈕狀態
+            // 判斷左下角按鈕狀態
             const isSearchResultPresent = !!searchResult;
 
             return (
@@ -529,7 +532,7 @@
                                         />
                                         {inputDisplayValue && (
                                             <button
-                                                // 🌟 加大點擊範圍: p-2 (padding: 8px)
+                                                // 加大點擊範圍: p-2 (padding: 8px)
                                                 onClick={handleClearAll}
                                                 className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white p-2"
                                             >
@@ -590,7 +593,7 @@
                                     </div>
                                     <div className="grid grid-cols-3 gap-3">
                                         <button
-                                            // 🌟 根據狀態切換功能 (Backspace / Clear All)
+                                            // 根據狀態切換功能 (Backspace / Clear All)
                                             onClick={isSearchResultPresent ? handleClearAll : handleBackspace}
                                             className={`aspect-square glass-button rounded-2xl flex items-center justify-center hover:scale-95 active:scale-90 transition-all ${isSearchResultPresent ? 'text-blue-400' : 'text-red-400'}`}
                                         >
@@ -612,7 +615,7 @@
                                     </div>
                                 </div>
 
-                                {/* 🌟 資料來源貼齊鍵盤 */}
+                                {/* 資料來源貼齊鍵盤 */}
                                 <div className="p-2 text-center text-xs text-gray-500">
                                     <p>資料來源：g0v 統編查詢 API</p>
                                     <p className="mt-1">資料儲存於瀏覽器本地</p>
@@ -650,13 +653,15 @@
                                 {/* 搜尋框 - 實現置頂固定 (Sticky) */}
                                 <div className="sticky top-0 z-10 pt-4 pb-4 -mx-4 px-4 bg-black/80 backdrop-blur-md"> 
                                     <div className="relative flex items-center">
-                                        <Search className="w-5 h-5 absolute left-7 text-gray-500 pointer-events-none" />
+                                        {/* 🌟 調整 Icon 位置和顏色 */}
+                                        <Search className="w-5 h-5 absolute left-6 text-gray-500 pointer-events-none" />
                                         <input
                                             type="text"
                                             value={historySearchText}
                                             onChange={(e) => setHistorySearchText(e.target.value)}
                                             placeholder="搜尋統編或公司名稱"
-                                            className="w-full pl-12 pr-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500"
+                                            // 🌟 調整 padding-left 至 pl-13
+                                            className="w-full pl-13 pr-4 py-4 glass-card rounded-2xl outline-none focus:border focus:border-blue-500 placeholder:text-gray-500"
                                         />
                                         {historySearchText && (
                                             <button
@@ -812,7 +817,7 @@
                         )}
                     </div>
                     
-                    {/* 🌟 Back to Top Button */}
+                    {/* Back to Top Button */}
                     {showBackToTop && (
                         <button
                             onClick={scrollToTop}
